@@ -1,7 +1,37 @@
 version: "3.9"
 
 services:
+  scheduler:
+    build: scheduler/.
+    ports:
+      - "81:80"
+    depends_on:
+      - database
+    profiles:
+      - scheduler_services
   storefront:
-    build: .
+    build: storefront/.
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - database
+    profiles:
+      - storefront_services
+#      context: .
+#      args:
+#        - joyce=0
+##enviroment variables
+#    environment:
+#      - runtime_env=dev
   database:
     image: "mysql"
+    env_file:
+      - ./mysql/env_vars
+    volumes:
+      - ./mysql:docker-entrypoint-initdb.d:ro
+      - testdb:/var/lib/mysql
+volumes:
+    testdb:
+
+
